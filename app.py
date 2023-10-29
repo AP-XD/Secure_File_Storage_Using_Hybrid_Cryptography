@@ -7,9 +7,11 @@ from flask import send_file
 import time
 import os
 script = ''
+from flask import make_response
+from flask import request
 
 UPLOAD_FOLDER = '.'
-ALLOWED_EXTENSIONS = set(['txt','docx','png','jpg','pdf','jpeg','zip','rtf'])
+ALLOWED_EXTENSIONS = set(['txt','docx','png','jpg','pdf','jpeg','zip','rtf','webp'])
 
 # api = API(app)
 app = Flask(__name__)
@@ -74,16 +76,23 @@ def return_files_key():
         return str(e)
 
 
+
 @app.route('/return-files-data/')
 def return_files_data():
     try:
+        extension = request.cookies.get('ext')  # Retrieve the value of the 'ext' cookie
+        if extension is None:  # Handle the case when the 'ext' cookie is not found
+            raise Exception('Cookie not found')
+
         return send_file(
             './Output.txt',
             as_attachment=True,
-            download_name='output.txt'
+            download_name=f'output{extension}'  # Use the obtained extension value in the download name
         )
     except Exception as e:
         return str(e)
+
+
 
 
 
@@ -97,11 +106,17 @@ def upload_file():
       return render_template('Nofile.html')
     if file and allowed_file(file.filename):
       filename = secure_filename(file.filename)
+      extension = os.path.splitext(filename)[1]
       file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'Original.txt'))
       file.save(os.path.join(app.config['UPLOAD_FOLDER'],file.filename ))
-      return start()
+
+      # Setting the cookie
+      resp = make_response(start())
+      resp.set_cookie('ext', extension)  # Setting the 'ext' cookie with the file extension
+      return resp
        
     return render_template('Invalid.html')
+
     
 if __name__ == '__main__':
   app.run(debug=True)
