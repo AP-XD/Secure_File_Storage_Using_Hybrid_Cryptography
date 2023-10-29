@@ -9,7 +9,7 @@ import os
 script = ''
 
 UPLOAD_FOLDER = '.'
-ALLOWED_EXTENSIONS = set(['txt'])
+ALLOWED_EXTENSIONS = set(['txt','docx','png','jpg','pdf','jpeg','zip','rtf'])
 
 # api = API(app)
 app = Flask(__name__)
@@ -46,7 +46,7 @@ def DecryptMessage():
   return resultD()
 
 def start():
-  content = open('./Original.txt','r')
+  content = open('./Original.txt','rb')
   content.seek(0)
   first_char = content.read(1) 
   if not first_char:
@@ -98,6 +98,7 @@ def upload_file():
     if file and allowed_file(file.filename):
       filename = secure_filename(file.filename)
       file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'Original.txt'))
+      file.save(os.path.join(app.config['UPLOAD_FOLDER'],file.filename ))
       return start()
        
     return render_template('Invalid.html')

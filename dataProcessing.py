@@ -1,7 +1,9 @@
 import os
+import base64
+
 def Segment():
-	f=open('Original.txt','r')
-	con=f.read()
+	f=open('Original.txt','rb')
+	con = base64.b64encode(f.read()).decode('utf-8')
 	f.close()
 	count=0
 	for char in con:
@@ -68,13 +70,13 @@ def trim():
 
 
 def Merge():
-	mainFile=open("Output.txt","w")
+	mainFile=open("Output.txt","wb")
 	for i in range(0,5):
 		name=os.path.join(os.getcwd()+"/Segments",str(i)+".txt")
 		f=open(name,"r")
 		cont=f.read()
 		print('From Encrypted file - ',i,'->',cont)
-		mainFile.write(cont)
+		mainFile.write(base64.b64decode(cont))
 		f.close()
 		os.remove(name)
 	mainFile.close()
