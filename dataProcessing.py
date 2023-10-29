@@ -76,7 +76,10 @@ def Merge():
 		f=open(name,"r")
 		cont=f.read()
 		print('From Encrypted file - ',i,'->',cont)
-
+		
+		padding = len(cont) % 4
+		if padding > 0:
+			cont += '=' * (4 - padding)
 		mainFile.write(base64.b64decode(cont))
 		f.close()
 		os.remove(name)
